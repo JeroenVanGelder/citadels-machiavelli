@@ -24,7 +24,19 @@ class DraftCharacterCardsGameState(State):
     def __init__(self):
         State.__init__(self)
         self.allowedActions=list()
-        self.allowedActions.extend(["draftCharacterCards"])
+        self.allowedActions.extend(["draftCharacterCards", "runCharacterTurns"])
+
+    def on_event(self, event, *argv):
+        if event == 'runCharacterTurns':
+            return RunCharacterTurnsGameState()
+
+        return self
+
+class RunCharacterTurnsGameState(State):
+    def __init__(self):
+        State.__init__(self)
+        self.allowedActions=list()
+        self.allowedActions.extend(["takeTurnAction"])
 
     def on_event(self, event, *argv):
         if event == 'start_game':
