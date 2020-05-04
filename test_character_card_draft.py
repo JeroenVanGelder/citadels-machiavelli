@@ -1,10 +1,9 @@
 import unittest, random
 from machiavalli_game import MachiavelliGame
 from player.playerDescriptions import PlayerDescription
+from test_machiavelli_game import TestMachiavelliGame
 
-
-
-class CharacterCardDraftTest(unittest.TestCase):
+class CharacterCardDraftTest(TestMachiavelliGame):
 
     def setUp(self):
         self.game = MachiavelliGame()
@@ -122,27 +121,6 @@ class CharacterCardDraftTest(unittest.TestCase):
         gamestate = self.game.getState()
         turnGameState = "RunCharacterTurnsGameState"
         self.assertEqual(turnGameState, gamestate)
-
-    def runFullRandomDraft(self):    
-        jeroenCard = self.getRandomCardName()
-        self.game.draftCharacterCard("jeroen", jeroenCard)
-        robinCard = self.getRandomCardName()
-        self.game.draftCharacterCard("robin", robinCard)
-        sanderCard = self.getRandomCardName()
-        self.game.draftCharacterCard("sander", sanderCard)
-        martijnCard = self.getRandomCardName()
-        self.game.draftCharacterCard("martijn", martijnCard)
-        casperCard = self.getRandomCardName()
-        self.game.draftCharacterCard("casper", casperCard)
-        return {"jeroen": jeroenCard,
-            "robin": robinCard, 
-            "sander": sanderCard, 
-            "martijn": martijnCard, 
-            "casper": casperCard
-        }
-
-
-
 
 if __name__ == '__main__':
     unittest.main()

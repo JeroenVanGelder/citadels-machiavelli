@@ -1,5 +1,6 @@
 from game_state_controller import GameStateController
-from cards.character_cards import characterCardsList
+from cards.character_cards import CharacterCards
+from cards.character_card_controller import CharacterCardController
 from player.player import Player
 from player.player_controller import PlayerController
 import random
@@ -10,7 +11,7 @@ class MachiavelliGame(object):
     def __init__(self):
         self.gameState = GameStateController()
         self.playerController = PlayerController()
-        self.characterCards = characterCardsList
+        self.characterCardsController = CharacterCardController()
 
     def registerPlayer(self, playerDescription):
         if "registerPlayer" in self.gameState.get_allowed_actions():
@@ -23,30 +24,15 @@ class MachiavelliGame(object):
     def startGame(self):
         if "startGame" in self.gameState.get_allowed_actions():
             self.gameState.on_event("startGame")
-            self.resetCharacterCardS()
+            self.resetCharacterCards()
             self.exposeCharacterCards()
 
-    def resetCharacterCardS(self):
-        for card in self.characterCards:
-            card.reset()
+    def resetCharacterCards(self):
+        self.characterCardsController.resetCharacterCards
 
     def exposeCharacterCards(self):
         amountOfPlayers = self.playerController.getAmountOfPlayers()
-        if amountOfPlayers is 4:
-            openAmount = 2
-        elif amountOfPlayers is 5:
-            openAmount = 1
-        else:
-            openAmount = 0
-
-        for x in range(0,openAmount):
-            cardIsKing = True
-            while cardIsKing:
-                rnd = random.randint(0, len(self.characterCards)-1)
-                if self.characterCards[rnd].name is not "koning":
-                    cardIsKing = False
-            self.characterCards[rnd].openCard()
-
+        self.characterCardsController.exposeCharacterCards(amountOfPlayers)
 
     def getState(self):
         return self.gameState.get_game_state().__class__.__name__
@@ -67,21 +53,14 @@ class MachiavelliGame(object):
         return player
 
     def getCharacterCard(self, characterCard):
-        cardFound = None
-        for card in self.characterCards:
-            if card.name is characterCard:
-                cardFound = card
-        return cardFound
+        characterCard = self.characterCardsController.getCharacterCard(characterCard)
+        return characterCard
 
     def getAllCharacterCards(self):
-        return self.characterCards
+        return self.characterCardsController.getAllCharacterCards()
 
     def getAvailableCharacterCards(self):
-        availableCards = list()
-        for card in self.characterCards:
-            if card.available is True:
-                availableCards.append(card)
-        return availableCards
+        return self.characterCardsController.getAvailableCharacterCards()
 
     def startCharacterTurns(self):
         if "runCharacterTurns" in self.gameState.get_allowed_actions():
@@ -100,3 +79,5 @@ class MachiavelliGame(object):
     def playerTakeAction(self, player, action):
         if "takeTurnAction" in self.gameState.get_allowed_actions():
             self.playerController.playerTakeAction(player, action)
+            if self.playerController.allTurnsTaken():
+                self.gameState.on_event("runCharacterCardsDraft")

@@ -1,6 +1,5 @@
 from player.player import Player
 
-
 class PlayerController(object):
 
     def __init__(self):
@@ -62,3 +61,10 @@ class PlayerController(object):
                 pass
         else:
             raise Exception(player.name, 'is not the current player', self.getActivePlayingPlayer().name)
+
+    def allTurnsTaken(self):
+        turnsTaken = self.activePlayingPlayerPosition
+        amountOfPlayer = self.getAmountOfPlayers()
+        if turnsTaken >= amountOfPlayer:
+            return True
+        return False

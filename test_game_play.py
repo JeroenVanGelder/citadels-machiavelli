@@ -2,8 +2,9 @@ import unittest
 from machiavalli_game import MachiavelliGame
 from player.playerDescriptions import PlayerDescription
 from state_machines.game_states import StartingGameState, DraftCharacterCardsGameState
+from test_machiavelli_game import TestMachiavelliGame
 
-class GamePlayTest(unittest.TestCase):
+class GamePlayTest(TestMachiavelliGame):
 
     def test_add_player_to_game(self):
         game = MachiavelliGame()

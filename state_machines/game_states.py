@@ -39,7 +39,6 @@ class RunCharacterTurnsGameState(State):
         self.allowedActions.extend(["takeTurnAction"])
 
     def on_event(self, event, *argv):
-        if event == 'start_game':
-            return StartGameState()
-
+        if event == 'runCharacterCardsDraft':
+            return DraftCharacterCardsGameState()
         return self

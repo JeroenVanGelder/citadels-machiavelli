@@ -17,16 +17,3 @@ class CharacterCards(object):
     def reset(self):
         self.open = False
         self.available = True
-
-characterCardsList = []
-
-moordenaar = CharacterCards('moordenaar',1,'kill a guy')
-dief = CharacterCards('dief',2,'Steal stuff')
-magier = CharacterCards('magier',3,'Swap hands')
-koning = CharacterCards('koning',4,'Select First Card')
-prediker = CharacterCards('prediker',5,'Imune to condottiere')
-koopman = CharacterCards('koopman',6,'extra doekoe')
-bouwmeester = CharacterCards('bouwmeester',7,'twee kaarten en drie bouwen')
-condottiere = CharacterCards('condottiere',8,'mol n gebouw')
-
-characterCardsList.extend([moordenaar, dief, magier, koning, prediker, koopman, bouwmeester, condottiere])
