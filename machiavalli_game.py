@@ -3,8 +3,8 @@ from cards.character_cards import CharacterCards
 from cards.character_card_controller import CharacterCardController
 from player.player import Player
 from player.player_controller import PlayerController
+from cards.buildingCardsController import BuildingCardsController
 import random
-
 
 class MachiavelliGame(object):
 
@@ -12,10 +12,14 @@ class MachiavelliGame(object):
         self.gameState = GameStateController()
         self.playerController = PlayerController()
         self.characterCardsController = CharacterCardController()
+        self.buildingCardsController = BuildingCardsController()
 
     def registerPlayer(self, playerDescription):
         if "registerPlayer" in self.gameState.get_allowed_actions():
             self.playerController.registerPlayer(playerDescription)
+            player = self.getPlayer(playerDescription.name)
+            startingCards = self.buildingCardsController.getRandomBuildingCards(4)
+            self.playerController.addPlayerBuildingCards(player, startingCards)
     
     def getPlayer(self, playerName):
         playerFound = self.playerController.getPlayer(playerName)
@@ -76,8 +80,86 @@ class MachiavelliGame(object):
         player = self.playerController.getActivePlayingPlayer()
         return player
 
-    def playerTakeAction(self, player, action):
+    def getAllPlayers(self):
+        return self.playerController.getAllPlayers()
+
+    ############################################################
+    ############    player actions      ########################
+    ############################################################
+
+    def playerTakeAction(self, playerName, actionName, **kwargs):
         if "takeTurnAction" in self.gameState.get_allowed_actions():
-            self.playerController.playerTakeAction(player, action)
+            player = self.getPlayer(playerName)
+            action = self.getPlayerAction(actionName)
+            self.executePlayerAction(player, action, **kwargs)
             if self.playerController.allTurnsTaken():
                 self.gameState.on_event("runCharacterCardsDraft")
+
+    def executePlayerAction(self, player, action, **kwargs): 
+        if player is self.playerController.getActivePlayingPlayer():
+            try:
+                if any(kwargs):
+                    action(player, **kwargs)
+                else:
+                    action(player)
+            except:
+                raise Exception(action, "is not a known or allowed action")
+        else:
+            raise Exception(player.name, 'is not the current player', self.getActivePlayingPlayer().name)
+
+    def getPlayerAction(self, actionName):
+        return {
+            'pick_gold': self.pickGold,
+            'pass_turn': self.passTurn,
+            'pick_cards': self.pickBuildingCards,
+            'build_card': self.buildABuildingCard
+            }.get(actionName)
+
+    def buildABuildingCard(self, player, **kwargs):
+        buildingCardName = kwargs['buildingCard']
+        try:
+            buildingCard = { card.name : card for card in player.getBuildingCardsInHand()}[buildingCardName]
+            player.buildABuildingCard(buildingCard)
+        except:
+            print(player.getBuildingCardsInHand())
+            raise Exception(buildingCardName, "is not a card ", player.name, "has")
+
+
+    def pickBuildingCards(self, player):
+        randomBuildingCards = self.buildingCardsController.getRandomBuildingCards(2)
+        player.setBuildingCardSelection(randomBuildingCards)
+        pass
+    
+    def playerSelectBuildingCard(self, playerName, card):
+        player = self.getPlayer(playerName)
+        if "takeTurnAction" in self.gameState.get_allowed_actions():
+            if player is self.playerController.getActivePlayingPlayer():
+                if card in player.getBuildingCardSelection():
+                    player.selectBuildingCard(card)
+        
+
+    def passTurn(self,player):
+        self.playerController.passTurn(player)
+
+    def pickGold(self, player):
+        if player.pickedStartingResource is False:
+            self.playerController.pickGold(player)
+        else:
+            raise Exception("Player already picked a resource")
+
+    ############################################################
+    ############    Building cards      ########################
+    ############################################################
+
+
+    def getAllBuildingCards(self):
+        buildingCards = self.buildingCardsController.getAllBuildingCards()
+        return buildingCards
+
+    def getAllAvailableBuildingCards(self):
+        buildingCards = self.buildingCardsController.getAllAvailableBuildingCards()
+        return buildingCards
+
+    def getPlayerBuildingCardSelection(self, playerName):
+        return self.playerController.getPlayerBuildingCardSelection(playerName)
+        

@@ -52,15 +52,30 @@ class PlayerController(object):
     def getActivePlayingPlayer(self):
         player = self.playerRegister[self.activePlayingPlayerPosition]
         return player
+
+    def getAllPlayers(self):
+        return self.playerRegister
     
-    def playerTakeAction(self, player, action):
-        if player is self.getActivePlayingPlayer():
-            if action is "pass_turn":
-                self.activePlayingPlayerPosition += 1
-            else:
-                pass
+    def getPlayerBuildingCardSelection(self, playerName):
+        player = self.getPlayer(playerName)
+        return player.getBuildingCardSelection()
+
+    def pickBuildingCards(self, player, buildingCards):
+        if player.pickedStartingResource is False:
+            self.addPlayerBuildingCards(player, buildingCards)
+            player.pickedStartingResource = True
         else:
-            raise Exception(player.name, 'is not the current player', self.getActivePlayingPlayer().name)
+            raise Exception("Player already picked a resource")
+
+    def passTurn(self,player):
+        self.activePlayingPlayerPosition += 1
+
+    def pickGold(self, player):
+        if player.pickedStartingResource is False:
+            self.addPlayerGold(player, 2)
+            player.pickedStartingResource = True
+        else:
+            raise Exception("Player already picked a resource")
 
     def allTurnsTaken(self):
         turnsTaken = self.activePlayingPlayerPosition
@@ -68,3 +83,10 @@ class PlayerController(object):
         if turnsTaken >= amountOfPlayer:
             return True
         return False
+
+    def addPlayerGold(self, player, gold):
+        player.gold = player.gold + gold
+
+    def addPlayerBuildingCards(self, player, buildingCards):
+        for buildingCard in buildingCards:
+            player.addBuildingCardToHand(buildingCard)
