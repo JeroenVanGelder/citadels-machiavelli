@@ -46,3 +46,4 @@ class Player(object):
 
     def getGold(self):
         return self.gold
+

@@ -8,8 +8,14 @@ class PlayerController(object):
         self.activePlayingPlayerPosition = 0
 
     def registerPlayer(self, playerDescription):
-        position = len(self.playerRegister)
-        self.playerRegister.append(Player(playerDescription.name, position))
+        if self.getPlayer(playerDescription.name) is None:
+            if len(self.playerRegister) < 8:
+                position = len(self.playerRegister)
+                self.playerRegister.append(Player(playerDescription.name, position))
+            else:
+                raise ValueError('Players are already registerd')    
+        else:
+            raise ValueError('Player already registered')
 
     def getPlayer(self, playerName):
         playerFound = None
