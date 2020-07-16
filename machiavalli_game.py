@@ -1,10 +1,12 @@
 from game_state_controller import GameStateController
-from cards.character_cards import CharacterCards
-from cards.character_card_controller import CharacterCardController
 from player.player import Player
 from player.player_controller import PlayerController
 from cards.buildingCardsController import BuildingCardsController
+from cards.character_cards import CharacterCards
+from cards.character_card_controller import CharacterCardController
+
 import random
+import json
 
 class MachiavelliGame(object):
 
@@ -14,12 +16,19 @@ class MachiavelliGame(object):
         self.characterCardsController = CharacterCardController()
         self.buildingCardsController = BuildingCardsController()
 
+
+    #unimplemented
+    def toJson(self):
+        pass
+
     def registerPlayer(self, playerDescription):
         if "registerPlayer" in self.gameState.get_allowed_actions():
             self.playerController.registerPlayer(playerDescription)
             player = self.getPlayer(playerDescription.name)
             startingCards = self.buildingCardsController.getRandomBuildingCards(4)
             self.playerController.addPlayerBuildingCards(player, startingCards)
+        else:
+            raise RuntimeError("Action not allowed")
     
     def getPlayer(self, playerName):
         playerFound = self.playerController.getPlayer(playerName)
@@ -27,9 +36,14 @@ class MachiavelliGame(object):
 
     def startGame(self):
         if "startGame" in self.gameState.get_allowed_actions():
-            self.gameState.on_event("startGame")
-            self.resetCharacterCards()
-            self.exposeCharacterCards()
+            if len(self.playerController.getAllPlayers()) >= 2:
+                self.gameState.on_event("startGame")
+                self.resetCharacterCards()
+                self.exposeCharacterCards()
+            else:
+                raise RuntimeError("Not enough players registered")        
+        else:
+            raise RuntimeError("Action not allowed")
 
     def resetCharacterCards(self):
         self.characterCardsController.resetCharacterCards
@@ -39,7 +53,8 @@ class MachiavelliGame(object):
         self.characterCardsController.exposeCharacterCards(amountOfPlayers)
 
     def getState(self):
-        return self.gameState.get_game_state().__class__.__name__
+        game_state = self.gameState.get_game_state().__class__.__name__
+        return game_state
     
     def draftCharacterCard(self, pickPlayerName, characterCard):
         if "draftCharacterCards" in self.gameState.get_allowed_actions():
