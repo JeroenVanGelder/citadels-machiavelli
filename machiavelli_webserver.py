@@ -79,5 +79,5 @@ def get_playing_player():
 
 # run server
 if __name__ == '__main__':
-    webserver.run(debug=True)
+    webserver.run(debug=True, host='0.0.0.0')
 
